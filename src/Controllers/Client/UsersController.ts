@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { UsersService } from '../../Services/UsersService';
+import { UsersRepository } from '../../Repositories/UsersRepository';
 
 
-class userController{
+class usersController{
     private  usersService:UsersService;
     constructor(
       usersService:UsersService
@@ -10,20 +11,22 @@ class userController{
         this.usersService = usersService;
    
     }
-    register =async (req:Request, res:Response, next:NextFunction)=>{
+    register =async (req:Request, res:Response, next: NextFunction)=>{
         
 
         try{
             const  data= req.body;
             await this.usersService.validation(data);
-
-
+            const user = await this.usersService.store(data);
+            res.status(201).json({ "user":user});
         }catch(error){
-console.log(error)
+            console.error(error);
+            next(error);
         }
     }
 }
-//مقدار هارو دریافت کنی 
-//اعتبار سنجی کنی 
-// ذخیره کنی 
-//خروجی نمایش بدی 
+const  usersRepository = new UsersRepository();
+const usersService = new UsersService(usersRepository);
+const UsersController= new usersController(usersService);
+
+export{UsersController, usersService,usersRepository};

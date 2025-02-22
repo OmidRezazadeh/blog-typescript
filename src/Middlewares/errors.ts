@@ -18,6 +18,7 @@ export const errorHandler = (
       status: error.statusCode,
       message: error.message,
     });
+    next();
   } catch (err) {
     // Handling errors that occur during error handling (meta, right?)
     console.error('Error in errorHandler while handling error:', err);

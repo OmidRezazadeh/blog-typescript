@@ -1,6 +1,7 @@
 
 import { UsersRepository } from '../Repositories/UsersRepository';
 import {registerValidate} from '../Validations/UserValidate';
+import bcrypt from "bcryptjs";
 export class UsersService{
       
         private usersRepository:UsersRepository;
@@ -21,7 +22,7 @@ export class UsersService{
             // Check if the user already exists
             const userExists = await this.usersRepository.findByEmail(data.email);
             if (userExists) {
-                const errorEmail = new Error(" ایمیل تکراریست");
+                const errorEmail = new Error("ایمیل تکراریست");
                 (errorEmail as any).status = 400;
                 throw errorEmail;
             }
@@ -36,6 +37,8 @@ export class UsersService{
     }
     
     async store(data:any):Promise<any>{
+        const hashPassword = await bcrypt.hashSync(data.password, 10);
+        data.password= hashPassword;  
         const user=  await this.usersRepository.store(data); 
         return user;
     }

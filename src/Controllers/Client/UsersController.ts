@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { UsersService } from "../../Services/UsersService";
 import { UsersRepository } from "../../Repositories/UsersRepository";
+import { getDecodedToken } from "../../Utlis/getDecodedToken";
 
 class usersController {
   private usersService: UsersService;
@@ -43,7 +44,11 @@ class usersController {
 
       }
   }
-  
+  test= async(req: Request, res: Response, next: NextFunction)=>{
+      const token = getDecodedToken(req.get("Authorization"));
+      console.log(token)
+  }
+
 }
 const usersRepository = new UsersRepository();
 const usersService = new UsersService(usersRepository);

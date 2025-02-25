@@ -1,7 +1,8 @@
 
 import { UsersRepository } from '../Repositories/UsersRepository';
-import {registerValidate} from '../Validations/UserValidate';
+import {registerValidate, validationLogin} from '../Validations/UserValidate';
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 export class UsersService{
       
         private usersRepository:UsersRepository;
@@ -42,4 +43,39 @@ export class UsersService{
         const user=  await this.usersRepository.store(data); 
         return user;
     }
+    async validationLogin(data:any){
+        const { error } = validationLogin.validate(data);
+        if (error) {
+          const errors = new Error(error.details[0].message);
+          (errors as any).status = 400;
+          throw errors;
+        }
+        
+    let email = data.email;
+    const userExists = await this.usersRepository.findByEmail(email);
+    if (!userExists) {
+        const errorEmail = new Error("کاربری بااین ایمیل  یافت نشد");
+        (errorEmail as any).status = 400;
+        throw errorEmail;
+      }
+    
+
+    }
+  async auth(data:any){
+    const user = await this.usersRepository.findByEmail(data.email);
+  
+    if (user && await bcrypt.compare(data.password, user.password)) {
+      const token = jwt.sign(
+        { user: { user_id: user._id, email: user.email, name: user.name } },
+        process.env.JWT_SECRET as string,
+        { expiresIn: "2h" }
+      );
+        return token;
+    }
+    else{
+      const error = new Error("نام کاربری یا رمز عبور اشتباه است ");
+      (error as any).status = 400;
+      throw error;
+    }
+  }
 }

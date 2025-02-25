@@ -30,5 +30,10 @@ Joi.object({
     password:passwordValidate,
 })
 
+export const validationLogin=Joi.object({
+    email:emailValidate,
+   password:passwordValidate,
+})
+
 
 

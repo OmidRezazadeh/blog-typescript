@@ -5,4 +5,5 @@ import { UsersController } from "../Controllers/Client/UsersController";
 export const UserRouter = express.Router();
 
 UserRouter.post('/register', UsersController.register.bind(UsersController));
+UserRouter.post('/login', UsersController.login.bind(UsersController));
 

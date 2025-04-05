@@ -2,21 +2,39 @@ import { Request, Response, NextFunction } from "express";
 import { UsersService } from "../../Services/UsersService";
 import { UsersRepository } from "../../Repositories/UsersRepository";
 import { getDecodedToken } from "../../Utlis/getDecodedToken";
+import { ProfilesService } from '../../Services/ProfilesService';
+import { ProfileRepository } from "../../Repositories/ProfilesRepository";
 
 class usersController {
   private usersService: UsersService;
-  constructor(usersService: UsersService) {
+  private profilesService: ProfilesService;
+  
+  constructor(
+    usersService: UsersService,
+    profilesService:ProfilesService
+  ) {
     this.usersService = usersService;
+    this.profilesService=profilesService
   }
   register = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const data = req.body;
-
-      await this.usersService.validation(data);
-
+     
+     await this.usersService.validation(data);
+      //transaction todo profile
+      const profile = await this.profilesService.store(data)
+     const profileId= profile?._id
+      data.profile = profileId
+     //transaction todo user
       const user = await this.usersService.store(data);
+      
+      //transaction todo profile
+        // const profile = await this.profilesService.store(data)
 
-      res.status(201).json({ user: user });
+      res.status(201).json({ 
+        user: user,
+        profile:profile
+       });
 
     } catch (error) {
       console.error(error);
@@ -51,7 +69,9 @@ class usersController {
 
 }
 const usersRepository = new UsersRepository();
+const profilesRepository= new ProfileRepository();
 const usersService = new UsersService(usersRepository);
-const UsersController = new usersController(usersService);
+const profilesService = new ProfilesService(profilesRepository)
+const UsersController = new usersController(usersService,profilesService);
 
-export { UsersController, usersService, usersRepository };
+export { UsersController, usersService, usersRepository,profilesRepository, profilesService};

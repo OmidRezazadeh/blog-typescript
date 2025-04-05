@@ -17,6 +17,8 @@ const passwordValidate =Joi.string()
     'string.max': 'رمز عبور نمی‌تواند بیشتر از 19 کاراکتر باشد', // Custom error message for maximum length
     'any.required': 'رمز عبور اجباری است', // Custom error message for required field
 });
+const phoneRegex = /^09\d{9}$/;
+
 
 export const registerValidate=
 Joi.object({
@@ -28,7 +30,14 @@ Joi.object({
     }),
     email:emailValidate,
     password:passwordValidate,
+     bio:Joi.string().allow(null),
+     address:Joi.string().required(),
+     phone: Joi.string().pattern(phoneRegex).required().messages({
+        'string.pattern.base': 'شماره موبایل باید با 09 شروع شده و 11 رقم باشد',
+        'any.required': 'شماره موبایل اجباری است',
+      }),
 })
+
 
 export const validationLogin=Joi.object({
     email:emailValidate,

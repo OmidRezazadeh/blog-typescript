@@ -21,4 +21,15 @@ export class UsersRepository implements UserInterface {
       console.log(error);
     }
   }
+
+  async findById(userId:string){
+     try {
+
+      return await User.findOne({ _id: userId }).populate('profile');
+    
+     } catch (error) {
+      console.log(error)
+     }
+
+  }
 }

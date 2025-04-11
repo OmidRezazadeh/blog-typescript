@@ -78,4 +78,9 @@ export class UsersService{
       throw error;
     }
   }
+
+   async findById(userId:string){
+    return  await this.usersRepository.findById(userId);
+
+   }
 }

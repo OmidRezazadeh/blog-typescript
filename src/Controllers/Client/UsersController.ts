@@ -4,6 +4,7 @@ import { UsersRepository } from "../../Repositories/UsersRepository";
 import { getDecodedToken } from "../../Utlis/getDecodedToken";
 import { ProfilesService } from '../../Services/ProfilesService';
 import { ProfileRepository } from "../../Repositories/ProfilesRepository";
+import { UserResource } from "../../transFormedData/User/UserResource";
 
 class usersController {
   private usersService: UsersService;
@@ -19,7 +20,7 @@ class usersController {
   register = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const data = req.body;
-     
+     //transaction todo User
      await this.usersService.validation(data);
       //transaction todo profile
       const profile = await this.profilesService.store(data)
@@ -28,8 +29,6 @@ class usersController {
      //transaction todo user
       const user = await this.usersService.store(data);
       
-      //transaction todo profile
-        // const profile = await this.profilesService.store(data)
 
       res.status(201).json({ 
         user: user,
@@ -62,9 +61,19 @@ class usersController {
 
       }
   }
-  test= async(req: Request, res: Response, next: NextFunction)=>{
+  getUser= async(req: Request, res: Response, next: NextFunction)=>{
+
       const token = getDecodedToken(req.get("Authorization"));
-      console.log(token)
+    try {
+      const userId=token.user.user_id
+      const user = await this.usersService.findById(userId)
+      const userData = UserResource(user);
+       res.status(200).json({"data":userData})
+      } catch (error) {
+      console.log(error)
+      next(error);
+    }
+
   }
 
 }

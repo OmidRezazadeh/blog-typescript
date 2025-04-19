@@ -1,4 +1,5 @@
 
+import { User } from '../Models/Users';
 import { UsersRepository } from '../Repositories/UsersRepository';
 import {registerValidate, validationLogin} from '../Validations/UserValidate';
 import bcrypt from "bcryptjs";
@@ -83,4 +84,10 @@ export class UsersService{
     return  await this.usersRepository.findById(userId);
 
    }
+
+   async list(data:any){
+
+
+    return await this.usersRepository.list(data)   
+  }
 }
